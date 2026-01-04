@@ -6,44 +6,68 @@ import java.util.Scanner;
 
 public class Biblioteca {
 
-    private List<Autor> autores;
+    private List<Autor> autores = new ArrayList<>();
     private List<Livro> livros = new ArrayList<>();
     private List<Emprestimo> emprestimos = new ArrayList<>();
 
-    public Biblioteca() {
-        Autor a1 = new Autor(2, "Romeu Ambriz", LocalDate.of(2003, Month.DECEMBER, 8));
-        Autor a2 = new Autor(1, "Monteiro Futila", LocalDate.of(2002, Month.MARCH, 2));
-        Autor a3 = new Autor(3, "Paixão Raimundo", LocalDate.of(2003, Month.APRIL, 14));
-
-        this.autores = new ArrayList<>();
-        autores.add(a2);
-        autores.add(a3);
-        autores.add(a1);
-
-        this.livros = new ArrayList<>();
-        livros.add(new Livro(1, "Roube Como um Artista", a2, false , LocalDate.now(), LocalDate.now()));
-        livros.add(new Livro(2, "Comunicação Assertiva", a3, true , LocalDate.now(), LocalDate.now()));
-        livros.add(new Livro(3, "Habitos Atomicos", a1, true , LocalDate.now(), LocalDate.now()));
+    //Gerenciamento de livros
+    public void adicionarLivro(Livro livro) {
+        this.livros.add(livro);
     }
 
-    public void emprestarLivro(int idLivro, String nomeCliente){
-        int novoId = this.emprestimos.size() + 1;
-        Livro livro = this.procurarLivro(idLivro);
-        Emprestimo e = new Emprestimo(novoId, livro, nomeCliente, LocalDate.now(), LocalDate.now().plusMonths(1));
+    public List<Livro> listarLivros() {
+        return this.livros;
     }
 
-    private Livro procurarLivro(int idLivro){
+    public Livro procurarLivroPorId(int idLivro){
         for (Livro livro : this.livros) {
-            if (livro.getId() == idLivro) return livro;
+            if (livro.getId() == idLivro) {
+                return livro;
+            }
         }
         return null;
     }
 
-    public void listarLivrosDisponiveis(){
-        for (Livro livro : this.livros) {
-            if (livro.isDisponivel()){
-                System.out.println(livro.toString());
+    public List<Livro> listarLivrosDisponiveis(){
+        List<Livro> livrosDisponiveis = new ArrayList<>();
+        for (Livro livro : livros) {
+            if (livro.isDisponivel()) {
+                livrosDisponiveis.add(livro);
             }
         }
+        return livrosDisponiveis;
+    }
+
+    //Gerenciamento de autores
+    public void adicionarAutor(Autor autor) {
+        this.autores.add(autor);
+    }
+
+    public List<Autor> listarAutores() {
+        return this.autores;
+    }
+
+    //Gerenciamento de emprestimos
+    public void emprestarLivro(Livro livro, String nomeCliente) {
+        if (livro.isDisponivel()) {
+            Emprestimo emprestimo = new Emprestimo(livro, nomeCliente);
+            this.emprestimos.add(emprestimo);
+            livro.setDisponivel(false);
+        } else {
+            System.out.println("Livro não disponível para empréstimo.");
+        }
+    }
+
+    public void devolverLivro(int idEmprestimo) {
+        for (Emprestimo emprestimo : this.emprestimos) {
+            if (emprestimo.getId() == idEmprestimo) {
+                emprestimo.devolverLivro();
+                break;
+            }
+        }
+    }
+
+    public List<Emprestimo> listarEmprestimos() {
+        return this.emprestimos;
     }
 }
